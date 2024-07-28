@@ -5,7 +5,9 @@
     private final android.content.SharedPreferences$OnSharedPreferenceChangeListener listener;
 }
 
--keep class me.gm.cleaner.plugin.xposed.XposedInit
+-keep class me.gm.cleaner.plugin.xposed.XposedInit {
+    *;
+}
 
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
 	public static void check*(...);
