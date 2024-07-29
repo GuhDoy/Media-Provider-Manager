@@ -62,12 +62,14 @@ class XposedInit : ManagerService(), IXposedHookLoadPackage, IXposedHookZygoteIn
         XposedHelpers.findAndHookMethod(File::class.java, "mkdirs", FileHooker())
     }
 
+    lateinit var methodHook: XC_MethodHook.Unhook
+
     @Throws(Throwable::class)
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
         if (lpparam.appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
             return
         }
-        XposedHelpers.findAndHookMethod(
+        methodHook = XposedHelpers.findAndHookMethod(
             ContentProvider::class.java, "attachInfo",
             Context::class.java, ProviderInfo::class.java, Boolean::class.java,
             object : XC_MethodHook() {
@@ -80,6 +82,7 @@ class XposedInit : ManagerService(), IXposedHookLoadPackage, IXposedHookZygoteIn
                         MediaStore.AUTHORITY -> onMediaProviderLoaded(lpparam, context)
                         Downloads_Impl_AUTHORITY -> onDownloadManagerLoaded(lpparam, context)
                     }
+                    methodHook.unhook()
                 }
             }
         )
